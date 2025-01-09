@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/composables/auth";
-import { Copy, User } from "lucide-vue-next";
+import {  User } from "lucide-vue-next";
 import { ref } from "vue";
 import { toast } from "vue-sonner";
 
