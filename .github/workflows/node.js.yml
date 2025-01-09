@@ -36,4 +36,4 @@ jobs:
           username: main@yohannes-sisay.com
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: dist/
-          server-dir: /personal-book
+          server-dir: /personal-book/
