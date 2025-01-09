@@ -43,7 +43,7 @@
       <p class="text-sm text-muted-foreground">{{ props.coverId }}</p>
       <Plus
         v-if="!props.data.added"
-        @click="addBook(props.data)"
+        @click="addBook()"
         class="hover:text-white border-black cursor-pointer hover:scale-110 hover:bg-black duration-300 ease-in-out border-2 rounded-full p-1 shadow-md"
         :size="32"
       />
@@ -61,7 +61,7 @@
 import Card from "@/components/ui/card/Card.vue";
 import CardFooter from "@/components/ui/card/CardFooter.vue";
 import Skeleton from "@/components/ui/skeleton/Skeleton.vue";
-import { deleteRequest, post, put } from "@/utils/api";
+import { deleteRequest, post } from "@/utils/api";
 import { Minus, Plus } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import { toast } from "vue-sonner";
@@ -85,7 +85,7 @@ const onImageLoad = () => {
   isLoading.value = false;
 };
 
-const addBook = async (currentBook: any) => {
+const addBook = async () => {
   isLoading.value = true;
   const authorNames = props.authors.map((author) => author.name).join(", ");
   const bookData = {
@@ -97,7 +97,7 @@ const addBook = async (currentBook: any) => {
     notes: "",
   };
 
-  const { success, message, data } = await post("/books", bookData);
+  const { success, message } = await post("/books", bookData);
 
   if (!success) {
     toast.error(message || "Failed to add book. Please try again.");
@@ -112,7 +112,7 @@ const addBook = async (currentBook: any) => {
 const removeBook = async () => {
   isLoading.value = true;
 
-  const { success, message, data } = await deleteRequest(
+  const { success, message } = await deleteRequest(
     `/books/${props.data.addedBookId}`
   );
 
