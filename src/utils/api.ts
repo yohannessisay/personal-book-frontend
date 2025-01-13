@@ -1,13 +1,13 @@
 import { toast } from "vue-sonner";
 import { isTokenExpired } from "./jwt";
+import { useAuth } from "@/composables/auth";
 
- 
 const API_URL = "http://localhost:3000";
- 
+
 const getAuthToken = () => {
   return localStorage.getItem("token");
 };
- 
+
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
     const errorData = await response.json();
@@ -16,18 +16,27 @@ const handleResponse = async (response: Response) => {
   }
   return { success: true, message: "", data: await response.json() };
 };
- 
 
 const requestWithAuth = async (url: string, method: string, body?: object) => {
-  const token = getAuthToken();
-
+  const token = getAuthToken(); 
+  if (!token) {
+    const { logout } = useAuth();
+    logout();
+    return {
+      success: false,
+      message: "Token expired. Please log in again.",
+      data: null,
+    };
+  }
   if (token && isTokenExpired(token)) {
     localStorage.removeItem("token");
     toast.error("Session expired. Please log in again.");
-    return { success: false, message: "Token expired. Please log in again.", data: null };
+    return {
+      success: false,
+      message: "Token expired. Please log in again.",
+      data: null,
+    };
   }
-
-
 
   const headers: HeadersInit = new Headers({
     "Content-Type": "application/json",
@@ -41,19 +50,23 @@ const requestWithAuth = async (url: string, method: string, body?: object) => {
       body: body ? JSON.stringify(body) : undefined,
     });
     return await handleResponse(response);
-  } catch (error: any) { 
+  } catch (error: any) {
     console.log(error);
-    
-    return { success: false, message: "Network error. Please try again later.", data: null };
+
+    return {
+      success: false,
+      message: "Network error. Please try again later.",
+      data: null,
+    };
   }
 };
 
 export const getWithoutAuth = async (url: string) => {
   try {
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -64,30 +77,33 @@ export const getWithoutAuth = async (url: string) => {
     }
 
     const data = await response.json();
-    return { success: true, message: '', data };
+    return { success: true, message: "", data };
   } catch (error: any) {
     console.error("Error fetching data:", error);
-    return { success: false, message: "Network error. Please try again later.", data: null };
+    return {
+      success: false,
+      message: "Network error. Please try again later.",
+      data: null,
+    };
   }
 };
 
 // GET Request
 export const get = async (url: string) => {
-  return await requestWithAuth(url, 'GET');
+  return await requestWithAuth(url, "GET");
 };
 
 // POST Request
 export const post = async (url: string, body: object) => {
-  return await requestWithAuth(url, 'POST', body);
+  return await requestWithAuth(url, "POST", body);
 };
 
 // PUT Request
 export const put = async (url: string, body: object) => {
-  return await requestWithAuth(url, 'PUT', body);
+  return await requestWithAuth(url, "PUT", body);
 };
 
 // DELETE Request
 export const deleteRequest = async (url: string) => {
-  return await requestWithAuth(url, 'DELETE');
+  return await requestWithAuth(url, "DELETE");
 };
-

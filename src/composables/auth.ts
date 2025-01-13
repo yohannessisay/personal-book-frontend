@@ -28,7 +28,8 @@ export function useAuth() {
     authState.email = null;
     authState.fullname = null;
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("email");
+    localStorage.removeItem("fullname");
   };
 
   const loadAuthData = () => {

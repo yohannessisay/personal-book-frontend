@@ -20,6 +20,7 @@ import { useAuth } from "../composables/auth";
 import { toast } from "vue-sonner";
 import BooksModal from "./common/books-modal.vue";
 import { get, getWithoutAuth } from "@/utils/api";
+import { useFetchMyBooks } from "@/composables/books";
 let debounceTimeout: ReturnType<typeof setTimeout>;
 const searchQuery = ref("");
 const currentPage = ref(1);
@@ -41,7 +42,8 @@ const fetchMyBooks = async (isReload: boolean = false) => {
   }
 
   loading.value = true;
-  const { success, message, data } = await get("/my-books");
+  const { fetchMyBooks } = useFetchMyBooks();
+  const { success, message, data } = await fetchMyBooks();
 
   if (!success) {
     toast.error(message || "Failed to fetch books. Please try again.");
@@ -78,7 +80,8 @@ const fetchBooksFromAPI = async (
 
     if (!fetchedData.work_count) {
       // Single book fetch scenario
-      const coverId = fetchedData.covers?.length > 0 ? fetchedData.covers[0] : "";
+      const coverId =
+        fetchedData.covers?.length > 0 ? fetchedData.covers[0] : "";
       const added = userBooks.filter(
         (userBook: any) => userBook.title === fetchedData.title
       );
@@ -94,7 +97,7 @@ const fetchBooksFromAPI = async (
 
       totalCount.value = 1;
       totalPages.value = Math.ceil(totalCount.value / limit);
-    } else { 
+    } else {
       totalCount.value = fetchedData.work_count || 0;
       totalPages.value = Math.ceil(totalCount.value / limit);
 
@@ -191,8 +194,8 @@ watch(currentPage, (newPage) => {
           v-for="(book, index) in books"
           :key="index"
           :title="book.title"
-          :authors="book.authors || []"
-          :cover-id="book.cover_id?.toString() || 'N/A'"
+          :is-edit="false"
+          :authors="book.authors || []" 
           :cover="book.cover_id?.toString()"
           :data="book"
           :reload-book="fetchMyBooks"
